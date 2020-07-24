@@ -4,12 +4,11 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
-flask8 ="*"
 
 [packages]
 django = "==2.2.5"
-pillow = "*"
 django-countries = "*"
+pillow = "*"
 
 [requires]
 python_version = "3.7"
