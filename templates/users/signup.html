@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block page_title %}
-Log in
+Sign up
 {% endblock page_title %}
 
 {% block search-bar %}
@@ -9,8 +9,10 @@ Log in
 
 {% block content %}
 
-    <form method="post" action="{% url 'users:login' %}">
+<form method="post" action="{% url 'users:signup' %}">
     {% csrf_token %}
     {{form.as_p}}
-    <button>Login</button>
-    </form>
+    <button>Sign Up</button>
+</form>
+
+{% endblock content %}
