@@ -5,6 +5,7 @@ from django.views.generic import FormView
 from django.urls import reverse_lazy
 from django.shortcuts import render, redirect, reverse
 from django.contrib.auth import authenticate, login, logout
+from django.core.files.base import ContentFile
 from . import forms, models
 
 
@@ -127,6 +128,7 @@ def github_callback(req):
                             first_name=name,
                             username=email,
                             bio=bio,
+                            email_verified=True,
                             login_method=models.User.LOGIN_GITHUB,)
                         user.set_unusable_password()
                         user.save()
@@ -141,26 +143,85 @@ def github_callback(req):
         # send error message
         return redirect(reverse('users:login'))
 
-# class LoginView(View):
 
-#     def get(self, req):
-#         form = forms.LoginForm(initial={'email': 'hanblues@gmail.com'})
-#         return render(req, 'users/login.html', {'form': form})
-
-#     def post(self, req):
-#         form = forms.LoginForm(req.POST)
-
-#         if form.is_valid():
-#             email = form.cleaned_data.get('email')
-#             password = form.cleaned_data.get('password')
-#             user = authenticate(req, username=email, password=password)
-#             if user is not None:
-#                 login(req, user)
-#                 return redirect(reverse('core:home'))
-
-#         return render(req, 'users/login.html', {'form': form})
+def kakao_login(req):
+    client_id = os.environ.get("KAKAO_ID")
+    redirect_uri = "http://127.0.0.1:8000/users/login/kakao/callback"
+    return redirect(f"https://kauth.kakao.com/oauth/authorize?client_id={client_id}&redirect_uri={redirect_uri}&response_type=code")
 
 
-# def log_out(req):
-#     logout(req)
-#     return redirect(reverse('core:home'))
+class KakaoException(Exception):
+    pass
+
+
+def kakao_callback(req):
+    try:
+        code = req.GET.get('code')
+        client_id = os.environ.get("KAKAO_ID")
+        redirect_uri = "http://127.0.0.1:8000/users/login/kakao/callback"
+        token_request = requests.get(
+            f"https://kauth.kakao.com/oauth/token?grant_type=authorization_code&client_id={client_id}&redirect_uri={redirect_uri}&code={code}")
+        token_json = token_request.json()
+        err = token_json.get('error', None)
+
+        if err is not None:
+            raise KakaoException()
+
+        access_token = token_json.get('access_token')
+
+        profile_request = requests.get(
+            'https://kapi.kakao.com/v2/user/me', headers={"Authorization": f"Bearer {access_token}"})
+
+        profile_json = profile_request.json()
+        kakao_account = profile_json.get('kakao_account', None)
+        if kakao_account is None:
+            raise KakaoException()
+        email = kakao_account.get('email')
+        properties = profile_json.get("properties")
+        nickname = properties.get('nickname')
+        profile_image = properties.get('profile_image')
+        try:
+            user = models.User.objects.get(email=email)
+            if user.login_method != models.User.LOGIN_KAKAO:
+                raise KakaoException()
+        except models.User.DoesNotExist:
+            user = models.User.objects.create(
+                email=email,
+                username=email,
+                first_name=nickname,
+                login_method=models.User.LOGIN_KAKAO,
+                email_verified=True,
+            )
+            user.set_unusable_password()
+            user.save()
+            if profile_image is not None:
+                photo_request = requests.get(profile_image)
+                user.avatar.save(f"{nickname}-avatar",
+                                 ContentFile(photo_request.content))
+
+        login(req, user)
+        return redirect(reverse("core:home"))
+    except KakaoException:
+        return redirect(reverse("users:login"))
+    # class LoginView(View):
+
+    #     def get(self, req):
+    #         form = forms.LoginForm(initial={'email': 'hanblues@gmail.com'})
+    #         return render(req, 'users/login.html', {'form': form})
+
+    #     def post(self, req):
+    #         form = forms.LoginForm(req.POST)
+
+    #         if form.is_valid():
+    #             email = form.cleaned_data.get('email')
+    #             password = form.cleaned_data.get('password')
+    #             user = authenticate(req, username=email, password=password)
+    #             if user is not None:
+    #                 login(req, user)
+    #                 return redirect(reverse('core:home'))
+
+    #         return render(req, 'users/login.html', {'form': form})
+
+    # def log_out(req):
+    #     logout(req)
+    #     return redirect(reverse('core:home'))
