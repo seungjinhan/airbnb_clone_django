@@ -8,11 +8,16 @@ Log in
 {% endblock search-bar %}
 
 {% block content %}
-    {% include 'partials/social_login.html' %}
-    <form method="post" action="{% url 'users:login' %}">
-        {% csrf_token %}
-        {{form.as_p}}
-        <button>Login</button>
-    </form>
 
+<div class="container lg:w-5/12 md:w-1/2 xl:w-1/4 mx-auto my-10 flex flex-col items-center border p-6 border-gray-400">
+
+    {% include 'partials/social_login.html' %}
+
+    {% include 'mixins/auth/auth_form.html' with form=form cta='로그인'%}
+
+    <div class="mt-5">
+        <span class="mr-2">아직 회원가입을 안하셨나요?</span>
+        <a href="{% url 'users:signup' %}" class="text-teal-500 font-bold">회원가입</a>
+    </div>
+</div>
 {% endblock content %}
