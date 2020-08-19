@@ -1,5 +1,6 @@
 import os
 import requests
+from django.core.files.base import ContentFile
 from django.views import View
 from django.contrib.auth.views import PasswordChangeView
 from django.views.generic import FormView, DetailView, UpdateView
@@ -7,15 +8,14 @@ from django.urls import reverse_lazy
 from django.shortcuts import render, redirect, reverse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
-from django.core.files.base import ContentFile
-from . import forms, models
+from django.contrib.messages.views import SuccessMessageMixin
+from . import forms, models, mixins
 
 
-class LoginView(FormView):
+class LoginView(mixins.LoggedOutOnlyView, FormView):
 
     template_name = 'users/login.html'
     form_class = forms.LoginForm
-    success_url = reverse_lazy('core:home')
 
     def form_valid(self, form):
         email = form.cleaned_data.get('email')
@@ -25,6 +25,12 @@ class LoginView(FormView):
             login(self.request, user)
         return super().form_valid(form)
 
+    def get_success_url(self):
+        next_arg = self.request.GET.get('next')
+        if next_arg is not None:
+            return next_arg
+        else:
+            return reverse('core:home')
     # def post(self, req):
     #     form = forms.LoginForm(req.POST)
 
@@ -239,7 +245,7 @@ class UserProfileView(DetailView):
         return context
 
 
-class UpdateUserProfileView(UpdateView):
+class UpdateUserProfileView(mixins.LoggedInOnlyView, SuccessMessageMixin, UpdateView):
     model = models.User
     template_name = "users/update-profile.html"
     fields = (
@@ -252,10 +258,18 @@ class UpdateUserProfileView(UpdateView):
         "language",
         "currency",
     )
+    success_message = 'Profile 수정완료'
 
     def get_object(self, queryset=None):
         return self.request.user
 
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class=form_class)
+        form.fields['first_name'].widget.attrs = {'placeholder': 'First Name'}
+        form.fields['last_name'].widget.attrs = {'placeholder': 'Last Name'}
+        form.fields['bio'].widget.attrs = {'placeholder': 'Bio'}
+        form.fields['birthdate'].widget.attrs = {'placeholder': 'Birthdate'}
+        return form
     # def form_valid(self, form):
     #     email = form.cleaned_data.get('email')
     #     self.object.username = email
@@ -263,5 +277,24 @@ class UpdateUserProfileView(UpdateView):
     #     return super().form_valid(form)
 
 
-class UpdatePasswordView(PasswordChangeView):
+class UpdatePasswordView(
+        mixins.LoggedInOnlyView,
+        mixins.EmailLoginOnlyView,
+        SuccessMessageMixin,
+        PasswordChangeView):
     template_name = 'users/update-password.html'
+    success_message = '패스워드 변경완료'
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class=form_class)
+        form.fields['old_password'].widget.attrs = {
+            'placeholder': 'Old Password'}
+        form.fields['new_password1'].widget.attrs = {
+            'placeholder': 'Password1'}
+        form.fields['new_password2'].widget.attrs = {
+            'placeholder': 'Password2'}
+
+        return form
+
+    def get_success_url(self):
+        return self.request.user.get_absolute_url()

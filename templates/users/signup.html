@@ -13,26 +13,6 @@ Sign up
     {% include 'partials/social_login.html' %}
 
     {% include 'mixins/auth/auth_form.html' with form=form cta='회원가입'%}
-    <!-- 
-    <form method="post" action="{% url 'users:signup' %}">
-        {% csrf_token %}
-
-
-        <div class="input">
-            {% if form.non_field_errors %}
-            {% for err in form.non_field_errors %}
-            <span class="text-red-700 font-medium text-sm">{{err}}</span>
-            {% endfor %}
-            {% endif %}
-        </div>
-
-
-        {% for field in form %}
-        {% include 'partials/form_input.html' with field=field %}
-        {% endfor %}
-
-        <button class="btn bg-red-500 text-white">Sign Up</button>
-    </form> -->
 
     <div class="mt-5">
         <span class="mr-2">이미 계정이 있나요?</span>
