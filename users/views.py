@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators import login_required
 import os
 import requests
 from django.core.files.base import ContentFile
@@ -298,3 +299,12 @@ class UpdatePasswordView(
 
     def get_success_url(self):
         return self.request.user.get_absolute_url()
+
+
+@login_required
+def switch_hosting(req):
+    try:
+        del req.session['is_hosting']
+    except KeyError:
+        req.session['is_hosting'] = True
+    return redirect(reverse("core:home"))
