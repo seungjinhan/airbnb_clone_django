@@ -1,4 +1,5 @@
 import uuid
+from django.utils.translation import gettext_lazy
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.db import models
@@ -16,15 +17,15 @@ class User(AbstractUser):
     GENDER_FEMALE = "female"
     GENDER_OTHER = "other"
     GENDER_CHOICES = (
-        (GENDER_MALE, "Male"),
-        (GENDER_FEMALE, "Female"),
-        (GENDER_OTHER, "Other"),
+        (GENDER_MALE, gettext_lazy("Male")),
+        (GENDER_FEMALE, gettext_lazy("Female")),
+        (GENDER_OTHER, gettext_lazy("Other")),
     )
 
     LANGUAGE_ENGLISH = "en"
     LANGUAGE_KOREAN = "kr"
-    LANGUAGE_CHOICES = ((LANGUAGE_ENGLISH, "English"),
-                        (LANGUAGE_KOREAN, "Korean"))
+    LANGUAGE_CHOICES = ((LANGUAGE_ENGLISH, gettext_lazy("English")),
+                        (LANGUAGE_KOREAN, gettext_lazy("Korean")))
 
     CURRENCY_USD = "usd"
     CURRENCY_KRW = "krw"
@@ -40,19 +41,22 @@ class User(AbstractUser):
     )
 
     avatar = models.ImageField(upload_to="avatars", blank=True)
-    gender = models.CharField(choices=GENDER_CHOICES,
+    gender = models.CharField(gettext_lazy("gender"), choices=GENDER_CHOICES,
                               max_length=10, blank=True)
-    bio = models.TextField(blank=True)
-    birthdate = models.DateField(blank=True, null=True)
-    language = models.CharField(
-        choices=LANGUAGE_CHOICES, max_length=2, blank=True, default=LANGUAGE_KOREAN)
-    currency = models.CharField(
-        choices=CURRENCY_CHOICES, max_length=3, blank=True, default=CURRENCY_KRW)
-    superhost = models.BooleanField(default=False)
-    email_verified = models.BooleanField(default=False)
-    email_secret = models.CharField(max_length=120, default='', blank=True)
-    login_method = models.CharField(
-        choices=LOGIN_CHOICES, max_length=50, default=LOGIN_EMAIL)
+    bio = models.TextField(gettext_lazy("bio"), blank=True)
+    birthdate = models.DateField(gettext_lazy(
+        "birthdate"), blank=True, null=True)
+    language = models.CharField(gettext_lazy("language"),
+                                choices=LANGUAGE_CHOICES, max_length=2, blank=True, default=LANGUAGE_KOREAN)
+    currency = models.CharField(gettext_lazy("currency"),
+                                choices=CURRENCY_CHOICES, max_length=3, blank=True, default=CURRENCY_KRW)
+    superhost = models.BooleanField(gettext_lazy("superhost"), default=False)
+    email_verified = models.BooleanField(
+        gettext_lazy("email_verified"), default=False)
+    email_secret = models.CharField(gettext_lazy(
+        "email_secret"), max_length=120, default='', blank=True)
+    login_method = models.CharField(gettext_lazy("login_method"),
+                                    choices=LOGIN_CHOICES, max_length=50, default=LOGIN_EMAIL)
 
     def get_absolute_url(self):
         return reverse("users:profile", kwargs={"pk": self.pk})
@@ -64,7 +68,7 @@ class User(AbstractUser):
             html_message = render_to_string(
                 "email/verify.html", {'secret': secret})
             send_mail(
-                'verify airbnb',
+                gettext_lazy('verify airbnb'),
                 strip_tags(html_message),
                 settings.EMAIL_FROM,
                 [self.email],

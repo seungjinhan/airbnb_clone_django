@@ -1,0 +1,98 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-08-23 22:45+0900\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: .\templates\base.html:28
+msgid "Search by City"
+msgstr "도시검색"
+
+#: .\templates\partials\footer.html:4
+msgid "Please don't copy"
+msgstr "카피하지마"
+
+#: .\templates\partials\footer.html:5
+msgid "All right reserved"
+msgstr "모든 권한에 책임이 있어"
+
+#: .\templates\rooms\room_list.html:28
+#, python-format
+msgid ""
+"Page\n"
+"      %(current_page)sof%(total_pages)s"
+msgstr "전체%(total_pages)s의%(current_page)s페이지"
+
+#: .\users\models.py:20
+msgid "Male"
+msgstr "남자"
+
+#: .\users\models.py:21
+msgid "Female"
+msgstr "여자"
+
+#: .\users\models.py:22
+msgid "Other"
+msgstr "다들성별"
+
+#: .\users\models.py:27
+msgid "English"
+msgstr "영어"
+
+#: .\users\models.py:28
+msgid "Korean"
+msgstr "한국어"
+
+#: .\users\models.py:44
+msgid "gender"
+msgstr "성"
+
+#: .\users\models.py:46
+msgid "bio"
+msgstr "바이로그래피"
+
+#: .\users\models.py:48
+msgid "birthdate"
+msgstr "생일"
+
+#: .\users\models.py:49
+msgid "language"
+msgstr "언어"
+
+#: .\users\models.py:51
+msgid "currency"
+msgstr "통화"
+
+#: .\users\models.py:53
+msgid "superhost"
+msgstr "슈퍼호스트"
+
+#: .\users\models.py:55
+msgid "email_verified"
+msgstr "이메일확인"
+
+#: .\users\models.py:57
+msgid "email_secret"
+msgstr "이메일비밀"
+
+#: .\users\models.py:58
+msgid "login_method"
+msgstr "로그인방법"
+
+#: .\users\models.py:71
+msgid "verify airbnb"
+msgstr "에어비엔비 인증"

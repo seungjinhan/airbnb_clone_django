@@ -1,6 +1,8 @@
 from django.contrib.auth.decorators import login_required
 import os
 import requests
+from django.utils import translation
+from django.http import HttpResponse
 from django.core.files.base import ContentFile
 from django.views import View
 from django.contrib.auth.views import PasswordChangeView
@@ -308,3 +310,10 @@ def switch_hosting(req):
     except KeyError:
         req.session['is_hosting'] = True
     return redirect(reverse("core:home"))
+
+
+def switch_language(req):
+    lang = req.GET.get('lang', None)
+    if lang is not None:
+        req.session[translation.LANGUAGE_SESSION_KEY] = lang
+    return HttpResponse(status=200)
